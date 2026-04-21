@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Humanizer (Localhost)</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Local Text Humanizer</h1>
+      <p class="subtitle">
+        Improve tone and readability of your own writing. This tool is for editing support, not for submitting copied work.
+      </p>
+
+      <label for="inputText">Paste your text</label>
+      <textarea id="inputText" rows="10" placeholder="Enter your draft text here..."></textarea>
+
+      <button id="humanizeBtn">Humanize Text</button>
+
+      <section class="output">
+        <h2>Humanized Output</h2>
+        <pre id="result"></pre>
+      </section>
+
+      <p id="note"></p>
+    </main>
+
+    <script>
+      const button = document.getElementById('humanizeBtn');
+      const input = document.getElementById('inputText');
+      const result = document.getElementById('result');
+      const note = document.getElementById('note');
+
+      button.addEventListener('click', async () => {
+        const text = input.value.trim();
+        result.textContent = '';
+        note.textContent = '';
+
+        if (!text) {
+          result.textContent = 'Please enter text first.';
+          return;
+        }
+
+        const response = await fetch('/humanize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || 'Something went wrong.';
+          return;
+        }
+
+        result.textContent = data.humanized_text;
+        note.textContent = data.note;
+      });
+    </script>
+  </body>
+</html>
